@@ -31,10 +31,11 @@ dist-ssr
 *.tsbuildinfo
 
 # C++ / Emscripten build artifacts
-# (Assuming local builds are for testing only)
 *.o
 *.obj
 *.wasm
+!public/games/*.wasm
+!public/games/*.js
 *.worker.js
 *.data
 *.wasm.map

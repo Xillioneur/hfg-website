@@ -42,7 +42,12 @@ const GameDetail: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-gray-100 dark:border-white/5">
             <div>
                 <div className="flex items-center gap-3 mb-2">
-                    <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-red-900/20 text-red-400'}`}>Native {game.language}</span>
+                    {game.series && (
+                        <span className={`px-3 py-1 rounded-md text-xs font-black uppercase tracking-widest ${theme === 'light' ? 'bg-indigo-50 text-indigo-600' : 'bg-void-accent/20 text-void-accent'}`}>
+                            {game.series}
+                        </span>
+                    )}
+                    <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 dark:bg-white/5 text-gray-500'}`}>Native {game.language}</span>
                     <span className="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-widest bg-gray-100 dark:bg-white/5 text-gray-500">v1.0.2 stable</span>
                 </div>
                 <h1 className={`text-5xl md:text-6xl font-black tracking-tighter leading-none ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{game.title}</h1>

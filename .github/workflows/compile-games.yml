@@ -1,0 +1,49 @@
+name: Compile Games to WASM
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/games/**'
+  workflow_dispatch:
+
+jobs:
+  build-games:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.51
+
+      - name: Create Games Output Directory
+        run: mkdir -p public/games
+
+      - name: Compile Code Review Episode 8
+        run: |
+          emcc src/games/cpp/code-review/episode-8/main.cpp 
+          -o public/games/cr-episode-8.js 
+          -s USE_GLFW=3 -s ASYNCIFY -s FORCE_FILESYSTEM=1 
+          -lraylib 
+          -O3
+
+      - name: Compile Code Review Episode 10
+        run: |
+          # Assuming engine.cpp exists or similar
+          emcc src/games/cpp/code-review/episode-10/*.cpp 
+          -o public/games/cr-episode-10.js 
+          -s USE_GLFW=3 -s ASYNCIFY -s FORCE_FILESYSTEM=1 
+          -lraylib 
+          -O3
+
+      - name: Commit and Push Compiled Binaries
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add public/games/
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: auto-compile games to wasm"
+          git push
