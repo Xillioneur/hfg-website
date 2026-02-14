@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HolyForge Game Runner</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: black; }
+        canvas { width: 100%; height: 100%; object-contain: contain; outline: none; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    <script>
+        // Get gameId from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const gameId = urlParams.get('game');
+
+        if (!gameId) {
+            console.error("No game ID provided to runner.");
+        } else {
+            // Emscripten Module configuration
+            window.Module = {
+                canvas: document.getElementById('canvas'),
+                print: (text) => window.parent.postMessage({ type: 'log', text }, '*'),
+                printErr: (text) => window.parent.postMessage({ type: 'error', text }, '*'),
+                onRuntimeInitialized: () => {
+                    window.parent.postMessage({ type: 'ready' }, '*');
+                },
+                locateFile: (path) => `/games/${path}`
+            };
+
+            // Load the game script
+            const script = document.createElement('script');
+            script.src = `/games/${gameId}.js`;
+            script.onerror = () => {
+                window.parent.postMessage({ type: 'error', text: `Failed to load /games/${gameId}.js` }, '*');
+            };
+            document.body.appendChild(script);
+        }
+    </script>
+</body>
+</html>

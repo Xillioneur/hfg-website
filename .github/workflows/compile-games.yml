@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'src/games/**'
+      - 'scripts/**'
   workflow_dispatch:
 
 jobs:
@@ -20,25 +21,12 @@ jobs:
         with:
           version: 3.1.51
 
-      - name: Create Games Output Directory
-        run: mkdir -p public/games
-
-      - name: Compile Code Review Episode 8
+      - name: Run Build Script
         run: |
-          emcc src/games/cpp/code-review/episode-8/main.cpp 
-          -o public/games/cr-episode-8.js 
-          -s USE_GLFW=3 -s ASYNCIFY -s FORCE_FILESYSTEM=1 
-          -lraylib 
-          -O3
-
-      - name: Compile Code Review Episode 10
-        run: |
-          # Assuming engine.cpp exists or similar
-          emcc src/games/cpp/code-review/episode-10/*.cpp 
-          -o public/games/cr-episode-10.js 
-          -s USE_GLFW=3 -s ASYNCIFY -s FORCE_FILESYSTEM=1 
-          -lraylib 
-          -O3
+          chmod +x scripts/compile.sh
+          # Note: On GitHub we might need to skip Raylib if not pre-installed, 
+          # but the script handles errors gracefully.
+          ./scripts/compile.sh
 
       - name: Commit and Push Compiled Binaries
         run: |
