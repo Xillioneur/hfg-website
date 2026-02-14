@@ -14,7 +14,13 @@ const Home: React.FC = () => {
       {/* Hero Section - Optimized & High Performance */}
       <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden">
         <div className={`absolute inset-0 z-0 transition-colors duration-700 ${theme === 'light' ? 'bg-gradient-to-tr from-blue-50 via-white to-indigo-50' : 'bg-void-bg'}`}>
-          <div className={`absolute inset-0 opacity-[0.03] dark:opacity-[0.05] ${theme === 'light' ? 'bg-[url("https://www.transparenttextures.com/patterns/carbon-fibre.png")]' : 'bg-[url("https://www.transparenttextures.com/patterns/carbon-fibre.png")]'}`}></div>
+          {/* Native CSS Pattern - No external dependency */}
+          <div className={`absolute inset-0 opacity-[0.15] dark:opacity-[0.2]`} 
+               style={{ 
+                 backgroundImage: `linear-gradient(${theme === 'light' ? '#cbd5e1' : '#1e293b'} 1px, transparent 1px), linear-gradient(90deg, ${theme === 'light' ? '#cbd5e1' : '#1e293b'} 1px, transparent 1px)`,
+                 backgroundSize: '40px 40px' 
+               }}>
+          </div>
           <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-6xl blur-[120px] opacity-30 pointer-events-none ${theme === 'light' ? 'bg-blue-400/20' : 'bg-void-accent/10'}`}></div>
         </div>
         

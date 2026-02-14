@@ -13,12 +13,12 @@
   --color-heaven-text: #1e293b;
   --color-heaven-border: #e2e8f0;
 
-  /* Dark Theme - High Performance / Gold */
-  --color-void-bg: #020617; /* Deeper midnight */
-  --color-void-primary: #0f172a;
-  --color-void-accent: #f59e0b; /* Amber Gold */
-  --color-void-text: #f8fafc;
-  --color-void-border: #1e293b;
+  /* Dark Theme - The Dark Side */
+  --color-void-bg: #050505;
+  --color-void-primary: #0f0f0f;
+  --color-void-accent: #ef4444; /* Sith Red */
+  --color-void-text: #a1a1aa;
+  --color-void-border: #1a1a1a;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
