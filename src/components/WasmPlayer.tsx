@@ -43,7 +43,19 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     };
 
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+
+    // Safety timeout: If no message is received within 10 seconds, something is blocked
+    const safetyTimeout = setTimeout(() => {
+        if (isLoading && !error) {
+            setError("SYSTEM_TIMEOUT: The game runner failed to respond. This is likely due to browser security policies (COEP/COOP) blocking the execution. Check the browser console for details.");
+            setIsLoading(false);
+        }
+    }, 10000);
+
+    return () => {
+        window.removeEventListener('message', handleMessage);
+        clearTimeout(safetyTimeout);
+    };
   }, [gameId]);
 
   return (
