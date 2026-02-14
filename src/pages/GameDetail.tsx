@@ -84,7 +84,7 @@ const GameDetail: React.FC = () => {
             <div className={`rounded-3xl overflow-hidden shadow-2xl transition-all ${theme === 'light' ? 'bg-white shadow-slate-200/50 border border-slate-100' : 'bg-black shadow-black/50 border border-white/5'}`}>
                 {activeTab === 'play' ? (
                     <div className="relative">
-                        <WasmPlayer gameId={game.id} assetCount={game.assets?.length || 0} />
+                        <WasmPlayer gameId={game.id} />
                     </div>
                 ) : (
                     <div className="flex flex-col md:flex-row h-[550px]">

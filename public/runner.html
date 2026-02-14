@@ -5,49 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HolyForge Game Runner</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: black; }
-        canvas { width: 100%; height: 100%; object-fit: contain; outline: none; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020617; }
+        canvas { 
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%; 
+            object-fit: contain; 
+            outline: none; 
+            background: black;
+        }
     </style>
 </head>
 <body>
     <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
     <script>
-        console.log("Runner: Initializing...");
-        
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('game');
 
         if (!gameId) {
-            console.error("Runner Error: No game ID provided.");
-            window.parent.postMessage({ type: 'error', text: 'No game ID provided to runner.' }, '*');
+            window.parent.postMessage({ type: 'error', text: 'No game ID provided.' }, '*');
         } else {
-            console.log("Runner: Preparing to load " + gameId);
-            
-            // Emscripten Module configuration
             window.Module = {
                 canvas: document.getElementById('canvas'),
-                print: (text) => {
-                    console.log("WASM Log:", text);
-                    window.parent.postMessage({ type: 'log', text }, '*');
-                },
-                printErr: (text) => {
-                    console.error("WASM Error:", text);
-                    window.parent.postMessage({ type: 'log', text }, '*'); // Send errors to console too
-                },
+                print: (text) => window.parent.postMessage({ type: 'log', text }, '*'),
+                printErr: (text) => window.parent.postMessage({ type: 'log', text }, '*'),
                 onRuntimeInitialized: () => {
-                    console.log("Runner: Runtime initialized for " + gameId);
                     window.parent.postMessage({ type: 'ready' }, '*');
                 },
                 locateFile: (path) => `/games/${path}`
             };
 
-            // Load the game script
             const script = document.createElement('script');
             script.src = `/games/${gameId}.js`;
             script.onerror = () => {
-                const msg = `Failed to load game script: /games/${gameId}.js`;
-                console.error(msg);
-                window.parent.postMessage({ type: 'error', text: msg }, '*');
+                window.parent.postMessage({ type: 'error', text: `Failed to load /games/${gameId}.js` }, '*');
             };
             document.body.appendChild(script);
         }
