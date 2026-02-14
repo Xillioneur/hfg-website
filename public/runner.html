@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>HolyForge Game Runner</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020617; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
         canvas { 
             position: absolute;
             top: 0; left: 0;
@@ -13,9 +13,7 @@
             object-fit: contain; 
             outline: none; 
             background: black;
-            /* Force GPU layer for the canvas */
-            will-change: transform;
-            transform: translateZ(0);
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
         }
     </style>
 </head>
@@ -25,26 +23,20 @@
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('game');
 
-        // Log Buffer to prevent postMessage flooding (Main Thread CPU Saver)
         const logQueue = [];
         let logFlushTimer = null;
 
         function flushLogs() {
             if (logQueue.length === 0) return;
-            // Send batch
-            const batch = logQueue.join('\n');
-            window.parent.postMessage({ type: 'log', text: batch }, '*');
-            logQueue.length = 0; // Clear
+            window.parent.postMessage({ type: 'log', text: logQueue.join('\n') }, '*');
+            logQueue.length = 0;
             logFlushTimer = null;
         }
 
         function queueLog(text) {
             if (!text) return;
             logQueue.push(text);
-            if (!logFlushTimer) {
-                // Throttle to 100ms (10fps log updates max)
-                logFlushTimer = setTimeout(flushLogs, 100);
-            }
+            if (!logFlushTimer) logFlushTimer = setTimeout(flushLogs, 200);
         }
 
         if (!gameId) {
@@ -55,7 +47,10 @@
                 print: (text) => queueLog(text),
                 printErr: (text) => queueLog(text),
                 onRuntimeInitialized: () => {
+                    // Critical for Mobile: Send ready multiple times to ensure parent receives it
                     window.parent.postMessage({ type: 'ready' }, '*');
+                    setTimeout(() => window.parent.postMessage({ type: 'ready' }, '*'), 500);
+                    setTimeout(() => window.parent.postMessage({ type: 'ready' }, '*'), 1500);
                 },
                 locateFile: (path) => `/games/${path}`
             };

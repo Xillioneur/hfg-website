@@ -20,12 +20,17 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     logBuffer.current.push(msg);
     if (logBuffer.current.length > 5) logBuffer.current.shift();
 
-    // Throttle to 5 updates per second (200ms)
+    // MOBILE OPTIMIZATION: If we see logs, the game is running. 
+    // Force clear loading if stuck on "Syncing" but logs are moving.
+    if (isLoading && logBuffer.current.length > 2) {
+        setIsLoading(false);
+    }
+
     if (updateTimer.current === null) {
       updateTimer.current = window.setTimeout(() => {
         setConsoleOutput(logBuffer.current.join('\n'));
         updateTimer.current = null;
-      }, 200);
+      }, 250);
     }
   };
 
@@ -37,9 +42,9 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     setIframeSrc('');
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return;
-      
       const { type, text } = event.data;
+      if (!type) return;
+
       if (type === 'log') addLog(text);
       if (type === 'error') {
         if (text && text.includes('Failed to load')) {
@@ -50,16 +55,16 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
         }
       }
       if (type === 'ready') {
-        addLog("> System Link Established.");
         setIsLoading(false);
       }
     };
 
     window.addEventListener('message', handleMessage);
 
+    // Initial load delay
     const timer = setTimeout(() => {
         setIframeSrc(`/runner.html?game=${gameId}&t=${Date.now()}`);
-    }, 100);
+    }, 200);
 
     return () => {
         setIframeSrc('');
@@ -70,15 +75,15 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
   }, [gameId]);
 
   return (
-    <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black transition-colors duration-300 ${theme === 'light' ? 'border border-slate-200' : 'border border-white/5'}`}>
+    <div className={`relative w-full aspect-video rounded-xl overflow-hidden bg-black transition-colors duration-300 ${theme === 'light' ? 'border border-slate-200 shadow-lg' : 'border border-white/5 shadow-2xl'}`}>
         
-        {/* The Game Runner Iframe */}
         {iframeSrc && !error && (
             <iframe 
                 src={iframeSrc}
                 className="w-full h-full border-none bg-black"
                 allow="cross-origin-isolated"
                 title="HolyForge Game Player"
+                scrolling="no"
             />
         )}
 
@@ -87,12 +92,11 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
             <div className={`absolute inset-0 flex flex-col items-center justify-center z-10 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
                 <div className={`w-6 h-6 border-2 rounded-full animate-spin mb-4 ${theme === 'light' ? 'border-slate-100 border-t-blue-600' : 'border-white/5 border-t-void-accent'}`}></div>
                 <div className={`font-black text-[9px] uppercase tracking-[0.3em] ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>
-                    Syncing
+                    {gameId === 'sample' ? 'Calibrating' : 'Syncing'}
                 </div>
             </div>
         )}
 
-        {/* Error State */}
         {error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/95 p-6 text-center">
                 <div className="text-red-500 font-bold mb-4 uppercase tracking-widest text-[10px] font-mono">LINK_ERROR</div>
@@ -105,8 +109,8 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
             </div>
         )}
 
-        {/* Terminal Console - Optimized for Static Rendering */}
-        <div className="absolute bottom-0 left-0 p-4 w-full pointer-events-none z-10">
+        {/* Console */}
+        <div className="absolute bottom-0 left-0 p-4 w-full pointer-events-none z-10 hidden sm:block">
             <div className={`font-mono text-[9px] p-2 rounded max-w-[240px] border ${theme === 'light' ? 'bg-white/60 text-blue-800 border-white' : 'bg-black/60 text-void-accent border-white/5'}`}>
                 <pre className="whitespace-pre-wrap m-0 opacity-70 leading-tight font-mono">{consoleOutput}</pre>
             </div>
