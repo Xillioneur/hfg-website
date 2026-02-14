@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { games } from '../data/games';
 import WasmPlayer from '../components/WasmPlayer';
-import { ArrowLeft, Code, Play } from 'lucide-react';
+import { ArrowLeft, Code, Play, Cpu, Clock, Box } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from '../context/ThemeContext';
 import { motion } from 'framer-motion';
 
@@ -12,6 +12,7 @@ const GameDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const game = games.find(g => g.id === id);
   const [activeTab, setActiveTab] = useState<'play' | 'code'>('play');
+  const [selectedFileIndex, setSelectedFileIndex] = useState(0);
   const { theme } = useTheme();
 
   if (!game) {
@@ -25,104 +26,153 @@ const GameDetail: React.FC = () => {
     );
   }
 
+  const currentFile = game.sourceFiles[selectedFileIndex];
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="container mx-auto px-6 py-10 max-w-6xl"
+      className="container mx-auto px-6 py-10 max-w-7xl"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Left Column - Main Player */}
-        <div className="lg:col-span-8 space-y-6">
-          <div className={`rounded-lg overflow-hidden border shadow-sm relative transition-colors ${theme === 'light' ? 'bg-white border-slate-200' : 'bg-void-primary border-void-border'}`}>
-            <div className={`flex items-center justify-between px-4 h-12 border-b transition-colors ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-void-border'}`}>
-              <div className="flex space-x-2 h-full">
+      <div className="mb-10">
+        <Link to="/games" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-current transition-colors mb-6 group">
+           <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" /> Back to Library
+        </Link>
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-gray-100 dark:border-white/5">
+            <div>
+                <div className="flex items-center gap-3 mb-2">
+                    <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-widest ${theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-red-900/20 text-red-400'}`}>Native {game.language}</span>
+                    <span className="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-widest bg-gray-100 dark:bg-white/5 text-gray-500">v1.0.2 stable</span>
+                </div>
+                <h1 className={`text-5xl md:text-6xl font-black tracking-tighter leading-none ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{game.title}</h1>
+            </div>
+            
+            <div className="flex items-center gap-4">
                 <button 
                   onClick={() => setActiveTab('play')}
-                  className={`px-4 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all border-b-2 ${
+                  className={`px-8 py-4 rounded-full font-bold text-sm shadow-lg transition-all flex items-center gap-2 ${
                     activeTab === 'play' 
-                      ? theme === 'light' ? 'text-heaven-accent border-heaven-accent' : 'text-void-accent border-void-accent'
-                      : 'text-slate-400 border-transparent hover:text-slate-600'
+                      ? theme === 'light' ? 'bg-slate-900 text-white shadow-slate-200' : 'bg-white text-black shadow-white/10'
+                      : 'bg-transparent border-2 border-gray-200 dark:border-white/10 text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:hover:text-white'
                   }`}
                 >
-                  <Play size={14} fill={activeTab === 'play' ? "currentColor" : "none"} /> Play
+                  <Play size={18} fill={activeTab === 'play' ? "currentColor" : "none"} /> Launch
                 </button>
                 <button 
                   onClick={() => setActiveTab('code')}
-                  className={`px-4 text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all border-b-2 ${
+                  className={`px-8 py-4 rounded-full font-bold text-sm border-2 transition-all flex items-center gap-2 ${
                     activeTab === 'code' 
-                      ? 'text-blue-500 border-blue-500' 
-                      : 'text-slate-400 border-transparent hover:text-slate-600'
+                      ? theme === 'light' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-red-500 text-red-400 bg-red-900/10'
+                      : 'border-gray-200 dark:border-white/10 text-gray-400 hover:border-gray-400 hover:text-gray-600 dark:hover:text-white'
                   }`}
                 >
-                  <Code size={14} /> Source
+                  <Code size={18} /> Source
                 </button>
-              </div>
-              <div className="text-[10px] font-mono text-slate-500 uppercase font-bold">
-                 {game.id}.wasm
-              </div>
             </div>
+        </div>
+      </div>
 
-            <div className={theme === 'light' ? 'bg-slate-100' : 'bg-black'}>
-              {activeTab === 'play' ? (
-                <WasmPlayer gameId={game.id} />
-              ) : (
-                <div className={`h-[450px] overflow-y-auto custom-scrollbar ${theme === 'light' ? 'bg-white' : 'bg-[#1e1e1e]'}`}>
-                  <SyntaxHighlighter 
-                    language="cpp" 
-                    style={theme === 'light' ? prism : vscDarkPlus} 
-                    showLineNumbers={true}
-                    customStyle={{ margin: 0, padding: '1.5rem', fontSize: '13px', lineHeight: '1.5', background: 'transparent' }}
-                  >
-                    {game.sourceCode}
-                  </SyntaxHighlighter>
-                </div>
-              )}
+      <div className="grid lg:grid-cols-12 gap-12">
+        {/* Main Stage */}
+        <div className="lg:col-span-8">
+            <div className={`rounded-3xl overflow-hidden shadow-2xl transition-all ${theme === 'light' ? 'bg-white shadow-slate-200/50 border border-slate-100' : 'bg-black shadow-black/50 border border-white/5'}`}>
+                {activeTab === 'play' ? (
+                    <div className="relative">
+                        <WasmPlayer gameId={game.id} assetCount={game.assets?.length || 0} />
+                    </div>
+                ) : (
+                    <div className="flex flex-col md:flex-row h-[550px]">
+                        <div className={`w-full md:w-48 border-b md:border-b-0 md:border-r transition-colors ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-zinc-900 border-white/5'}`}>
+                            <div className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Project Files</div>
+                            <div className="px-2 space-y-1">
+                                {game.sourceFiles.map((file, idx) => (
+                                    <button
+                                        key={file.name}
+                                        onClick={() => setSelectedFileIndex(idx)}
+                                        className={`w-full text-left px-3 py-2 rounded-md text-xs font-mono transition-all ${
+                                            selectedFileIndex === idx 
+                                                ? theme === 'light' ? 'bg-white text-blue-600 shadow-sm' : 'bg-white/10 text-white'
+                                                : 'text-slate-500 hover:text-current'
+                                        }`}
+                                    >
+                                        {file.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex-1 relative overflow-hidden bg-[#1e1e1e]">
+                            <div className={`absolute top-0 left-0 right-0 px-6 py-3 flex justify-between items-center text-xs font-mono border-b z-10 ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-zinc-900 border-white/5 text-gray-400'}`}>
+                                <span>{currentFile.name}</span>
+                                <span>{currentFile.language.toUpperCase()} • {new Blob([currentFile.content]).size} bytes</span>
+                            </div>
+                            <div className="h-full overflow-y-auto custom-scrollbar pt-12">
+                                <SyntaxHighlighter 
+                                    language={currentFile.language === 'h' ? 'cpp' : currentFile.language} 
+                                    style={vscDarkPlus} 
+                                    showLineNumbers={true}
+                                    customStyle={{ margin: 0, padding: '1.5rem', fontSize: '13px', lineHeight: '1.6', background: 'transparent' }}
+                                >
+                                    {currentFile.content}
+                                </SyntaxHighlighter>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-4">
-             <div className={`px-5 py-4 rounded-lg border flex-1 ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'bg-void-primary border-void-border'}`}>
-                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Target Platform</span>
-                <span className="font-bold text-sm">WASM / WebGL 2.0</span>
-             </div>
-             <div className={`px-5 py-4 rounded-lg border flex-1 ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'bg-void-primary border-void-border'}`}>
-                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Optimization</span>
-                <span className="font-bold text-sm">-O3 High Speed</span>
-             </div>
-          </div>
+            
+            <div className="mt-8 prose dark:prose-invert max-w-none">
+                <h3 className={`text-xl font-bold mb-4 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Mission Briefing</h3>
+                <p className={`text-lg leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-zinc-400'}`}>
+                    {game.description}
+                </p>
+            </div>
         </div>
 
-        {/* Right Column - Info */}
-        <div className="lg:col-span-4 space-y-6 sticky top-24">
-          <div className="space-y-4">
-            <Link to="/games" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-current transition-colors flex items-center gap-1">
-               <ArrowLeft size={10} strokeWidth={3} /> Return to Library
-            </Link>
-            <h1 className={`text-5xl font-black tracking-tighter leading-none ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{game.title}</h1>
-            <div className="flex gap-2">
-               <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded border ${theme === 'light' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-void-accent/10 text-void-accent border-void-accent/20'}`}>{game.language} Native</span>
-               <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-green-500/10 text-green-500 border border-green-500/20">Production Build</span>
-            </div>
-            <p className={`text-sm leading-relaxed font-medium ${theme === 'light' ? 'text-slate-600' : 'text-slate-400'}`}>
-              {game.description}
-            </p>
-          </div>
+        {/* Sidebar Intel */}
+        <div className="lg:col-span-4 space-y-8">
+            {game.assets && (
+                <div className={`p-8 rounded-3xl border ${theme === 'light' ? 'bg-blue-50 border-blue-100' : 'bg-void-accent/5 border-void-accent/10'}`}>
+                    <h4 className={`text-xs font-black uppercase tracking-widest mb-6 ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>Asset Manifest</h4>
+                    <div className="space-y-3">
+                        {game.assets.map(asset => (
+                            <div key={asset} className="flex items-center gap-3 text-xs font-mono">
+                                <Box size={14} className="opacity-50" />
+                                <span className={theme === 'light' ? 'text-slate-700' : 'text-slate-300'}>{asset}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
-          <div className={`p-6 rounded-2xl border transition-all ${theme === 'light' ? 'bg-slate-50 border-slate-100' : 'bg-void-primary/40 border-void-border'}`}>
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6">Technical Manifest</h4>
-            <div className="space-y-4 text-[11px] font-mono">
-               <div className="flex justify-between items-center"><span className="text-slate-500 font-bold uppercase tracking-widest text-[9px]">Compiler</span> <span className="font-bold">LLVM/Emscripten 3.1</span></div>
-               <div className="flex justify-between items-center"><span className="text-slate-500 font-bold uppercase tracking-widest text-[9px]">Optimization</span> <span className="text-green-500 font-bold">-O3 High Performance</span></div>
-               <div className="flex justify-between items-center"><span className="text-slate-500 font-bold uppercase tracking-widest text-[9px]">Asset Size</span> <span className="font-bold">245.4 KB (Brotli)</span></div>
-               <div className="flex justify-between items-center"><span className="text-slate-500 font-bold uppercase tracking-widest text-[9px]">Environment</span> <span className="font-bold">Isolated Sandbox</span></div>
+            <div className={`p-8 rounded-3xl border transition-all ${theme === 'light' ? 'bg-slate-50 border-slate-100' : 'bg-void-primary/40 border-void-border'}`}>
+                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Telemetry</h4>
+                <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-xl ${theme === 'light' ? 'bg-white text-blue-500 shadow-sm' : 'bg-white/10 text-white'}`}>
+                            <Cpu size={20} />
+                        </div>
+                        <div>
+                            <span className={`block font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Multi-threaded</span>
+                            <span className="text-sm text-gray-500">SharedArrayBuffer enabled</span>
+                        </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-xl ${theme === 'light' ? 'bg-white text-green-500 shadow-sm' : 'bg-white/10 text-white'}`}>
+                            <Clock size={20} />
+                        </div>
+                        <div>
+                            <span className={`block font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>60 FPS Lock</span>
+                            <span className="text-sm text-gray-500">Fixed timestep update</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-8 pt-8 border-t border-gray-200 dark:border-white/10">
+                    <button className={`w-full py-4 rounded-xl font-bold text-sm transition-all ${theme === 'light' ? 'bg-white border-2 border-slate-200 hover:border-slate-400 text-slate-700' : 'bg-white/5 hover:bg-white/10 text-white'}`}>
+                        Fetch Binary Bundle
+                    </button>
+                </div>
             </div>
-          </div>
-
-          <button className={`group w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] transition-all border shadow-2xl relative overflow-hidden ${theme === 'light' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-950 border-white hover:bg-void-accent hover:text-white hover:border-void-accent'}`}>
-             <span className="relative z-10">Deploy from Source</span>
-             <div className="absolute inset-0 bg-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-          </button>
         </div>
       </div>
     </motion.div>

@@ -3,9 +3,10 @@ import { useTheme } from '../context/ThemeContext';
 
 interface WasmPlayerProps {
   gameId: string;
+  assetCount?: number;
 }
 
-const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
+const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId, assetCount = 0 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +14,7 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
   const { theme } = useTheme();
 
   const addLog = (msg: string) => {
-    setConsoleOutput(prev => [...prev.slice(-4), msg]); // Keep last 5 lines
+    setConsoleOutput(prev => [...prev.slice(-6), msg]); // Keep last 7 lines for more context
   };
 
   useEffect(() => {
@@ -24,24 +25,34 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     
     if (theme === 'light') {
         timeouts.push(setTimeout(() => addLog("> Harmonizing metadata..."), 200));
-        timeouts.push(setTimeout(() => addLog(`> Ascending ${gameId}.wasm...`), 800));
-        timeouts.push(setTimeout(() => addLog("> Spiritually instantiating WASM..."), 1500));
+        if (assetCount > 0) {
+            for(let i = 0; i < assetCount; i++) {
+                timeouts.push(setTimeout(() => addLog(`> Fetching asset chunk ${i+1}/${assetCount}...`), 400 + (i * 300)));
+            }
+        }
+        timeouts.push(setTimeout(() => addLog(`> Ascending ${gameId}.wasm...`), 600 + (assetCount * 300)));
+        timeouts.push(setTimeout(() => addLog("> Spiritually instantiating WASM..."), 1200 + (assetCount * 300)));
         timeouts.push(setTimeout(() => {
             addLog("> Divine runtime ready.");
             addLog("> Let there be motion...");
             setIsLoading(false);
             startGameLoop();
-        }, 2500));
+        }, 2000 + (assetCount * 300)));
     } else {
         timeouts.push(setTimeout(() => addLog("> Corrupting metadata..."), 200));
-        timeouts.push(setTimeout(() => addLog(`> Summoning ${gameId}.wasm from the abyss...`), 800));
-        timeouts.push(setTimeout(() => addLog("> Forcing WASM instantiation..."), 1500));
+        if (assetCount > 0) {
+            for(let i = 0; i < assetCount; i++) {
+                timeouts.push(setTimeout(() => addLog(`> Extracting asset fragment ${i+1}/${assetCount}...`), 400 + (i * 300)));
+            }
+        }
+        timeouts.push(setTimeout(() => addLog(`> Summoning ${gameId}.wasm from the abyss...`), 600 + (assetCount * 300)));
+        timeouts.push(setTimeout(() => addLog("> Forcing WASM instantiation..."), 1200 + (assetCount * 300)));
         timeouts.push(setTimeout(() => {
             addLog("> The Void has initialized.");
             addLog("> Executing shadow loop...");
             setIsLoading(false);
             startGameLoop();
-        }, 2500));
+        }, 2000 + (assetCount * 300)));
     }
 
     return () => {
@@ -59,7 +70,8 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     let y = 50;
     let dx = 4;
     let dy = 4;
-    let hue = theme === 'light' ? 200 : 0; // Blue for light, Red/Void for dark
+    let angle = 0;
+    let hue = theme === 'light' ? 200 : 0;
 
     const render = () => {
         if (!canvasRef.current || !ctx) return;
@@ -67,28 +79,58 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
         ctx.fillStyle = theme === 'light' ? '#f0f9ff' : '#020617';
         ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-        if (x + 30 > canvasRef.current.width || x < 0) dx = -dx;
-        if (y + 30 > canvasRef.current.height || y < 0) dy = -dy;
+        if (gameId.toLowerCase().includes('3d')) {
+            // Simulated 3D Orbital Effect
+            angle += 0.02;
+            const centerX = canvasRef.current.width / 2;
+            const centerY = canvasRef.current.height / 2;
+            const radius = 100;
+            
+            // Draw a wireframe-style grid for 3D feel
+            ctx.strokeStyle = theme === 'light' ? '#cbd5e1' : '#1e293b';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < 10; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, centerY + (i-5)*20);
+                ctx.lineTo(canvasRef.current.width, centerY + (i-5)*20 + Math.sin(angle)*50);
+                ctx.stroke();
+            }
 
-        x += dx;
-        y += dy;
-        
-        if (theme === 'light') {
-            hue = (hue + 0.5) % 360;
-            ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+            x = centerX + Math.cos(angle) * radius;
+            y = centerY + Math.sin(angle) * radius * 0.5;
+            const size = 40 + Math.sin(angle) * 20;
+
+            ctx.fillStyle = theme === 'light' ? '#3b82f6' : '#f59e0b';
+            if (theme !== 'light') {
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#f59e0b';
+            }
+            ctx.fillRect(x - size/2, y - size/2, size, size);
+            ctx.shadowBlur = 0;
         } else {
-            ctx.fillStyle = '#ef4444'; // Solid Sith Red
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#ef4444';
+            // Standard 2D Bouncing
+            if (x + 30 > canvasRef.current.width || x < 0) dx = -dx;
+            if (y + 30 > canvasRef.current.height || y < 0) dy = -dy;
+            x += dx;
+            y += dy;
+            
+            if (theme === 'light') {
+                hue = (hue + 0.5) % 360;
+                ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+            } else {
+                ctx.fillStyle = '#f59e0b';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#f59e0b';
+            }
+            ctx.fillRect(x, y, 30, 30);
+            ctx.shadowBlur = 0;
         }
-
-        ctx.fillRect(x, y, 30, 30);
-        ctx.shadowBlur = 0; // Reset shadow
         
-        ctx.font = '16px monospace';
-        ctx.fillStyle = theme === 'light' ? '#0369a1' : '#ef4444';
-        ctx.fillText(`${theme === 'light' ? 'Ascended' : 'Void'}: ${gameId}.wasm`, 10, 20);
-        ctx.fillText('Efficiency: 100%', 10, 40);
+        ctx.font = '10px monospace';
+        ctx.fillStyle = theme === 'light' ? '#0369a1' : '#f59e0b';
+        ctx.fillText(`${theme === 'light' ? 'ASCENDED' : 'VOID'} ENGINE // ${gameId.toUpperCase()}.WASM`, 20, 30);
+        ctx.fillText(`V-SYNC: 60.0 FPS`, 20, 45);
+        ctx.fillText(`CONTEXT: ${gameId.toLowerCase().includes('3d') ? 'WEBGL_2.0' : 'CANVAS_2D'}`, 20, 60);
         
         const gradient = ctx.createLinearGradient(0, 0, canvasRef.current.width, canvasRef.current.height);
         if (theme === 'light') {
