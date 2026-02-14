@@ -13,6 +13,9 @@
             object-fit: contain; 
             outline: none; 
             background: black;
+            /* Force GPU layer for the canvas */
+            will-change: transform;
+            transform: translateZ(0);
         }
     </style>
 </head>
@@ -22,13 +25,35 @@
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('game');
 
+        // Log Buffer to prevent postMessage flooding (Main Thread CPU Saver)
+        const logQueue = [];
+        let logFlushTimer = null;
+
+        function flushLogs() {
+            if (logQueue.length === 0) return;
+            // Send batch
+            const batch = logQueue.join('\n');
+            window.parent.postMessage({ type: 'log', text: batch }, '*');
+            logQueue.length = 0; // Clear
+            logFlushTimer = null;
+        }
+
+        function queueLog(text) {
+            if (!text) return;
+            logQueue.push(text);
+            if (!logFlushTimer) {
+                // Throttle to 100ms (10fps log updates max)
+                logFlushTimer = setTimeout(flushLogs, 100);
+            }
+        }
+
         if (!gameId) {
             window.parent.postMessage({ type: 'error', text: 'No game ID provided.' }, '*');
         } else {
             window.Module = {
                 canvas: document.getElementById('canvas'),
-                print: (text) => window.parent.postMessage({ type: 'log', text }, '*'),
-                printErr: (text) => window.parent.postMessage({ type: 'log', text }, '*'),
+                print: (text) => queueLog(text),
+                printErr: (text) => queueLog(text),
                 onRuntimeInitialized: () => {
                     window.parent.postMessage({ type: 'ready' }, '*');
                 },

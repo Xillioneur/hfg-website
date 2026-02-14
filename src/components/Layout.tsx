@@ -22,11 +22,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className={`min-h-screen flex flex-col font-sans transition-colors duration-500 ${theme === 'light' ? 'bg-heaven-bg text-heaven-text' : 'bg-void-bg text-gray-300'}`}>
       
-      {/* Dynamic Nebula Background */}
-      <div className="nebula-bg">
-        <div className={`nebula-glow top-[-20%] left-[-10%] ${theme === 'light' ? 'bg-blue-200' : 'bg-blue-900'}`}></div>
-        <div className={`nebula-glow bottom-[-20%] right-[-10%] ${theme === 'light' ? 'bg-indigo-100' : 'bg-red-900'}`}></div>
-      </div>
+      {/* Zero-CPU Static Background */}
+      <div className="nebula-bg" />
 
       <header className="sticky top-0 z-50 h-16 glass-nav shadow-sm">
         <div className="container mx-auto px-6 h-full flex justify-between items-center">

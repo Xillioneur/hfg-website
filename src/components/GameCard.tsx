@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Game } from '../data/games';
 import { Play, ChevronRight } from 'lucide-react';
@@ -8,16 +8,21 @@ interface GameCardProps {
   game: Game;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ game }) => {
+const GameCard: React.FC<GameCardProps> = memo(({ game }) => {
   const { theme } = useTheme();
 
   return (
-    <Link to={`/games/${game.id}`} className={`group block relative overflow-hidden rounded-2xl transition-all duration-500 border-glow ${theme === 'light' ? 'bg-white' : 'bg-void-primary'}`}>
+    <Link 
+      to={`/games/${game.id}`} 
+      className={`group block relative overflow-hidden rounded-2xl transition-all duration-500 border-glow will-change-transform ${theme === 'light' ? 'bg-white' : 'bg-void-primary'}`}
+    >
       <div className="aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-900 relative">
         <img 
           src={game.thumbnail} 
           alt={game.title} 
           crossOrigin="anonymous"
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         <div className={`absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${theme === 'light' ? 'bg-blue-600/10' : 'bg-void-accent/5'}`}></div>
@@ -41,6 +46,6 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
       </div>
     </Link>
   );
-};
+});
 
 export default GameCard;

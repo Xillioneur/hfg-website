@@ -5,7 +5,6 @@ int main() {
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    // Use high-performance flags
     SetConfigFlags(FLAG_VSYNC_HINT); 
     InitWindow(screenWidth, screenHeight, "HolyForge Diagnostic");
     SetTargetFPS(60);
@@ -15,16 +14,11 @@ int main() {
     while (!WindowShouldClose()) {
         BeginDrawing();
             ClearBackground(BLACK);
-            
-            // Minimalist diagnostic visualization
-            // Using DrawRectangle instead of complex polygons for lower CPU usage
             DrawRectangleLines(screenWidth/2 - 50, screenHeight/2 - 50, 100, 100, (Color){ 245, 158, 11, 100 });
             DrawCircleGradient(screenWidth/2, screenHeight/2, 40 + (float)GetTime()*2, (Color){ 245, 158, 11, 20 }, BLANK);
-            
             DrawText("SYSTEM: STABLE", 20, 20, 10, GREEN);
             DrawText("WASM: ACTIVE", 20, 35, 10, GREEN);
             DrawFPS(screenWidth - 80, 20);
-            
         EndDrawing();
     }
 
