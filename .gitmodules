@@ -1,0 +1,6 @@
+[submodule "src/games/cpp/code-review/episode-8"]
+	path = src/games/cpp/code-review/episode-8
+	url = https://github.com/Xillioneur/episode-8.git
+[submodule "src/games/cpp/code-review/episode-10"]
+	path = src/games/cpp/code-review/episode-10
+	url = https://github.com/Xillioneur/episode-10.git
