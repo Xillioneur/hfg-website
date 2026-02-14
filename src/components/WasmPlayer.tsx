@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { Play } from 'lucide-react';
 
 interface WasmPlayerProps {
   gameId: string;
@@ -20,9 +21,8 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     logBuffer.current.push(msg);
     if (logBuffer.current.length > 5) logBuffer.current.shift();
 
-    // MOBILE OPTIMIZATION: If we see logs, the game is running. 
-    // Force clear loading if stuck on "Syncing" but logs are moving.
-    if (isLoading && logBuffer.current.length > 2) {
+    // AUTO-UNLOCK: If we see any activity, clear the loading screen
+    if (isLoading) {
         setIsLoading(false);
     }
 
@@ -42,6 +42,7 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     setIframeSrc('');
 
     const handleMessage = (event: MessageEvent) => {
+      // Relaxed origin check for mobile compatibility
       const { type, text } = event.data;
       if (!type) return;
 
@@ -61,7 +62,6 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
 
     window.addEventListener('message', handleMessage);
 
-    // Initial load delay
     const timer = setTimeout(() => {
         setIframeSrc(`/runner.html?game=${gameId}&t=${Date.now()}`);
     }, 200);
@@ -81,18 +81,30 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
             <iframe 
                 src={iframeSrc}
                 className="w-full h-full border-none bg-black"
-                allow="cross-origin-isolated"
+                allow="cross-origin-isolated; autoplay; fullscreen"
                 title="HolyForge Game Player"
                 scrolling="no"
+                sandbox="allow-scripts allow-same-origin allow-forms"
             />
         )}
 
-        {/* Loading Overlay */}
+        {/* Improved Mobile Loading Overlay */}
         {isLoading && !error && (
             <div className={`absolute inset-0 flex flex-col items-center justify-center z-10 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
-                <div className={`w-6 h-6 border-2 rounded-full animate-spin mb-4 ${theme === 'light' ? 'border-slate-100 border-t-blue-600' : 'border-white/5 border-t-void-accent'}`}></div>
-                <div className={`font-black text-[9px] uppercase tracking-[0.3em] ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>
-                    {gameId === 'sample' ? 'Calibrating' : 'Syncing'}
+                <div className={`w-8 h-8 border-2 rounded-full animate-spin mb-6 ${theme === 'light' ? 'border-slate-100 border-t-blue-600' : 'border-white/5 border-t-void-accent'}`}></div>
+                
+                <div className="text-center space-y-4">
+                    <div className={`font-black text-[10px] uppercase tracking-[0.3em] ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>
+                        {gameId === 'sample' ? 'System Calibrating' : 'Binary Syncing'}
+                    </div>
+                    
+                    {/* Manual Override for Mobile */}
+                    <button 
+                        onClick={() => setIsLoading(false)}
+                        className={`px-6 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 mx-auto ${theme === 'light' ? 'border-slate-200 text-slate-400 hover:bg-slate-50' : 'border-white/10 text-white/30 hover:text-white hover:bg-white/5'}`}
+                    >
+                        <Play size={12} fill="currentColor" /> Force Launch
+                    </button>
                 </div>
             </div>
         )}
@@ -109,7 +121,7 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
             </div>
         )}
 
-        {/* Console */}
+        {/* Console - Hidden on smallest mobile screens to save CPU */}
         <div className="absolute bottom-0 left-0 p-4 w-full pointer-events-none z-10 hidden sm:block">
             <div className={`font-mono text-[9px] p-2 rounded max-w-[240px] border ${theme === 'light' ? 'bg-white/60 text-blue-800 border-white' : 'bg-black/60 text-void-accent border-white/5'}`}>
                 <pre className="whitespace-pre-wrap m-0 opacity-70 leading-tight font-mono">{consoleOutput}</pre>
