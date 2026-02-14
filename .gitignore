@@ -1,0 +1,53 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+dist
+dist-ssr
+*.local
+
+# Editor folders and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Vite cache
+.vite
+
+# TypeScript
+*.tsbuildinfo
+
+# C++ / Emscripten build artifacts
+# (Assuming local builds are for testing only)
+*.o
+*.obj
+*.wasm
+*.worker.js
+*.data
+*.wasm.map
+*.out
+build/
+bin/
+
+# Environment variables
+.env
+.env.production
+.env.development
+.env.local
+.env.*.local
+
+# Cloudflare
+.wrangler/
