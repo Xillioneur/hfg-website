@@ -5,11 +5,11 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   server: {
+    cors: true,
     headers: {
       'Cross-Origin-Embedder-Policy': 'credentialless',
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Resource-Policy': 'cross-origin',
-      'Access-Control-Allow-Origin': '*',
     },
   },
   resolve: {

@@ -22,7 +22,6 @@ const GameCard: React.FC<GameCardProps> = memo(({ game }) => {
         <img 
           src={game.thumbnail} 
           alt={game.title} 
-          crossOrigin="anonymous"
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

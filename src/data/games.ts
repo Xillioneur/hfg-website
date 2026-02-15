@@ -27,9 +27,9 @@ export const games: Game[] = [
     series: 'Core Engine',
     category: 'Tech Demo',
     description: 'A native C++ diagnostic tool compiled directly on your machine to verify the HolyForge WASM bridge.',
-    metaDescription: 'Verify C++ WebAssembly performance with the HolyForge System Diagnostic tool. Native execution at 60 FPS.',
+    metaDescription: 'Verify C++ WebAssembly performance with the HolyForge System Diagnostic tool. Native execution at 60 FPS. Developed by Willie Johnson.',
     keywords: ['WASM', 'C++', 'WebAssembly', 'Performance', 'Raylib'],
-    thumbnail: '/assets/images/thumb-sample.svg',
+    thumbnail: '/assets/images/thumb-sample.png',
     language: 'C++',
     sourceFiles: [
       { name: 'main.cpp', path: '/source/sample/main.cpp', language: 'cpp' }
@@ -41,9 +41,9 @@ export const games: Game[] = [
     series: 'Code Review',
     category: 'Tutorial',
     description: 'A performance-optimized 2D game developed during the Code Review tutorial series. Demonstrates efficient memory management and sprite rendering in C++.',
-    metaDescription: 'Learn C++ optimization techniques for web games. Episode 8 covers spatial partitioning and memory efficiency in WASM.',
+    metaDescription: 'Learn C++ optimization techniques for web games. Episode 8 covers spatial partitioning and memory efficiency in WASM. By @liwawil.',
     keywords: ['Code Review', 'C++ Tutorial', 'Optimization', 'Game Dev', 'SDL2'],
-    thumbnail: '/assets/images/thumb-cr.svg',
+    thumbnail: '/assets/images/thumb-cr.png',
     language: 'C++',
     sourceFiles: [
       { name: 'main.cpp', path: '/source/episode-8/main.cpp', language: 'cpp' },
@@ -58,9 +58,9 @@ export const games: Game[] = [
     series: 'Code Review',
     category: 'Tutorial',
     description: 'Advanced gameplay mechanics and architectural patterns. This episode focuses on decoupling game logic from rendering.',
-    metaDescription: 'Advanced C++ game architecture for the web. Decouple logic from rendering with Episode 10 of Code Review.',
+    metaDescription: 'Advanced C++ game architecture for the web. Decouple logic from rendering with Episode 10 of Code Review by Willie Johnson.',
     keywords: ['Architecture', 'C++', 'Raylib', 'Tutorial', 'WASM'],
-    thumbnail: '/assets/images/thumb-cr.svg',
+    thumbnail: '/assets/images/thumb-cr.png',
     language: 'C++',
     sourceFiles: [
       { name: 'main.cpp', path: '/source/episode-10/main.cpp', language: 'cpp' }
@@ -71,9 +71,9 @@ export const games: Game[] = [
     title: 'Starforge 3D',
     category: 'Studio',
     description: 'A high-performance 3D space exploration demo built with Raylib.',
-    metaDescription: 'Experience native 3D space exploration in your browser with Starforge 3D. Powered by Raylib and WebAssembly.',
+    metaDescription: 'Experience native 3D space exploration in your browser with Starforge 3D. Powered by Raylib and WebAssembly. Crafted by @liwawil.',
     keywords: ['3D', 'Raylib', 'C++', 'Space', 'WASM'],
-    thumbnail: '/assets/images/thumb-starforge.svg',
+    thumbnail: '/assets/images/thumb-starforge.png',
     language: 'C++',
     assets: ['models/ship.obj', 'textures/skybox.png'],
     sourceFiles: [
