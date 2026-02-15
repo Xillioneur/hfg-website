@@ -6,8 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     headers: {
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
       'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+      'Access-Control-Allow-Origin': '*',
     },
   },
   resolve: {
@@ -16,7 +18,6 @@ export default defineConfig({
     },
   },
   build: {
-    // Optimize chunking to fix the "large chunks" warning
     rollupOptions: {
       output: {
         manualChunks: {
@@ -27,7 +28,6 @@ export default defineConfig({
         },
       },
     },
-    // Production optimizations
     target: 'esnext',
     minify: 'esbuild',
     cssMinify: true,
