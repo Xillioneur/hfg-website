@@ -1,14 +1,19 @@
 export interface SourceFileMetadata {
   name: string;
-  path: string; // URL to fetch the source from
+  path: string;
   language: 'cpp' | 'h' | 'c';
 }
+
+export type GameCategory = 'Tutorial' | 'Studio' | 'Tech Demo' | 'Classic';
 
 export interface Game {
   id: string;
   title: string;
   series?: string;
+  category: GameCategory;
   description: string;
+  metaDescription: string;
+  keywords: string[];
   thumbnail: string;
   sourceFiles: SourceFileMetadata[];
   assets?: string[];
@@ -20,8 +25,11 @@ export const games: Game[] = [
     id: 'sample',
     title: 'System Diagnostic',
     series: 'Core Engine',
+    category: 'Tech Demo',
     description: 'A native C++ diagnostic tool compiled directly on your machine to verify the HolyForge WASM bridge.',
-    thumbnail: 'https://placehold.co/600x400/020617/f59e0b?text=System+Diagnostic',
+    metaDescription: 'Verify C++ WebAssembly performance with the HolyForge System Diagnostic tool. Native execution at 60 FPS.',
+    keywords: ['WASM', 'C++', 'WebAssembly', 'Performance', 'Raylib'],
+    thumbnail: '/assets/images/thumb-sample.png',
     language: 'C++',
     sourceFiles: [
       { name: 'main.cpp', path: '/source/sample/main.cpp', language: 'cpp' }
@@ -31,8 +39,11 @@ export const games: Game[] = [
     id: 'cr-episode-8',
     title: 'Code Review: Episode 8',
     series: 'Code Review',
+    category: 'Tutorial',
     description: 'A performance-optimized 2D game developed during the Code Review tutorial series. Demonstrates efficient memory management and sprite rendering in C++.',
-    thumbnail: 'https://placehold.co/600x400/1e293b/f59e0b?text=Code+Review+E8',
+    metaDescription: 'Learn C++ optimization techniques for web games. Episode 8 covers spatial partitioning and memory efficiency in WASM.',
+    keywords: ['Code Review', 'C++ Tutorial', 'Optimization', 'Game Dev', 'SDL2'],
+    thumbnail: '/assets/images/thumb-cr.png',
     language: 'C++',
     sourceFiles: [
       { name: 'main.cpp', path: '/source/episode-8/main.cpp', language: 'cpp' },
@@ -45,8 +56,11 @@ export const games: Game[] = [
     id: 'cr-episode-10',
     title: 'Code Review: Episode 10',
     series: 'Code Review',
+    category: 'Tutorial',
     description: 'Advanced gameplay mechanics and architectural patterns. This episode focuses on decoupling game logic from rendering.',
-    thumbnail: 'https://placehold.co/600x400/0f172a/f59e0b?text=Code+Review+E10',
+    metaDescription: 'Advanced C++ game architecture for the web. Decouple logic from rendering with Episode 10 of Code Review.',
+    keywords: ['Architecture', 'C++', 'Raylib', 'Tutorial', 'WASM'],
+    thumbnail: '/assets/images/thumb-cr.png',
     language: 'C++',
     sourceFiles: [
       { name: 'main.cpp', path: '/source/episode-10/main.cpp', language: 'cpp' }
@@ -55,8 +69,11 @@ export const games: Game[] = [
   {
     id: 'starforge-3d',
     title: 'Starforge 3D',
+    category: 'Studio',
     description: 'A high-performance 3D space exploration demo built with Raylib.',
-    thumbnail: 'https://placehold.co/600x400/020617/f59e0b?text=Starforge+3D',
+    metaDescription: 'Experience native 3D space exploration in your browser with Starforge 3D. Powered by Raylib and WebAssembly.',
+    keywords: ['3D', 'Raylib', 'C++', 'Space', 'WASM'],
+    thumbnail: '/assets/images/thumb-starforge.png',
     language: 'C++',
     assets: ['models/ship.obj', 'textures/skybox.png'],
     sourceFiles: [

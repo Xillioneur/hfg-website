@@ -5,12 +5,22 @@ import GameCard from '../components/GameCard';
 import { ArrowRight, Code, Zap, Globe, Cpu, Terminal } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { motion } from 'framer-motion';
+import { useProgress } from '../hooks/useProgress';
+import SEO from '../components/SEO';
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
+  const { progress } = useProgress();
+
+  const recentlyPlayedGames = games.filter(g => progress.recentlyPlayed.includes(g.id));
 
   return (
-    <div className="pb-24">
+    <>
+      <SEO 
+        title="HolyForge Games | The Zenith of Native Web Gaming"
+        description="Experience elite C++ and C games running natively in your browser. Powered by WebAssembly and the HolyForge Engine. Crafted for Glory."
+      />
+      <div className="pb-24">
       {/* Hero Section - GPU Optimized */}
       <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden border-b border-slate-100 dark:border-void-border">
         <div className="container mx-auto px-6 relative z-10 text-center max-w-5xl">
@@ -43,7 +53,7 @@ const Home: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
               <Link to="/games" className={`group relative px-10 py-4 text-sm font-black uppercase tracking-widest rounded-full shadow-2xl transition-all hover:scale-105 overflow-hidden ${theme === 'light' ? 'bg-slate-900 text-white' : 'bg-void-accent text-white'}`}>
-                <span className="relative z-10 flex items-center gap-2 text-glow">Execute Games <ArrowRight size={16} /></span>
+                <span className="relative z-10 flex items-center gap-2">Execute Games <ArrowRight size={16} /></span>
                 <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${theme === 'light' ? 'bg-blue-600' : 'bg-red-600'}`}></div>
               </Link>
               <Link to="/about" className={`px-10 py-4 text-sm font-black uppercase tracking-widest rounded-full border-2 transition-all ${theme === 'light' ? 'border-slate-200 text-slate-600 hover:border-slate-900 hover:text-slate-900' : 'border-zinc-800 text-zinc-400 hover:border-white hover:text-white'}`}>
@@ -53,6 +63,23 @@ const Home: React.FC = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Recently Played - Dynamic Section */}
+      {recentlyPlayedGames.length > 0 && (
+        <section className="container mx-auto px-6 pt-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className={`w-1.5 h-6 rounded-full ${theme === 'light' ? 'bg-blue-600' : 'bg-void-accent'}`} />
+            <h2 className={`text-xl font-black uppercase tracking-widest ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Recent Activity</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recentlyPlayedGames.map(game => (
+              <motion.div key={game.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <GameCard game={game} />
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured Games - Lazy Animation */}
       <section className="container mx-auto px-6 py-20">
@@ -125,8 +152,8 @@ const Home: React.FC = () => {
           ))}
         </div>
       </section>
-    </div>
-  );
-};
-
+          </div>
+        </>
+      );
+    };
 export default Home;

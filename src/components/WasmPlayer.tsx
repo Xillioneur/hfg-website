@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import CrossSpinner from './CrossSpinner';
 import { Play } from 'lucide-react';
 
 interface WasmPlayerProps {
@@ -21,10 +22,8 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     logBuffer.current.push(msg);
     if (logBuffer.current.length > 5) logBuffer.current.shift();
 
-    // AUTO-UNLOCK: If we see any activity, clear the loading screen
-    if (isLoading) {
-        setIsLoading(false);
-    }
+    // AUTO-UNLOCK: Clear loading if stuck but logs are moving
+    if (isLoading) setIsLoading(false);
 
     if (updateTimer.current === null) {
       updateTimer.current = window.setTimeout(() => {
@@ -42,7 +41,6 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     setIframeSrc('');
 
     const handleMessage = (event: MessageEvent) => {
-      // Relaxed origin check for mobile compatibility
       const { type, text } = event.data;
       if (!type) return;
 
@@ -88,20 +86,18 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
             />
         )}
 
-        {/* Improved Mobile Loading Overlay */}
+        {/* Cinematic Loading Overlay */}
         {isLoading && !error && (
-            <div className={`absolute inset-0 flex flex-col items-center justify-center z-10 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
-                <div className={`w-8 h-8 border-2 rounded-full animate-spin mb-6 ${theme === 'light' ? 'border-slate-100 border-t-blue-600' : 'border-white/5 border-t-void-accent'}`}></div>
+            <div className={`absolute inset-0 flex flex-col items-center justify-center z-10 backdrop-blur-md ${theme === 'light' ? 'bg-white/80' : 'bg-black/90'}`}>
+                <CrossSpinner color={theme === 'light' ? '#2563eb' : '#ef4444'} />
                 
-                <div className="text-center space-y-4">
-                    <div className={`font-black text-[10px] uppercase tracking-[0.3em] ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>
-                        {gameId === 'sample' ? 'System Calibrating' : 'Binary Syncing'}
+                <div className="text-center space-y-4 mt-8">
+                    <div className={`font-black text-[9px] uppercase tracking-[0.3em] ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>
+                        Initializing Binary
                     </div>
-                    
-                    {/* Manual Override for Mobile */}
                     <button 
                         onClick={() => setIsLoading(false)}
-                        className={`px-6 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 mx-auto ${theme === 'light' ? 'border-slate-200 text-slate-400 hover:bg-slate-50' : 'border-white/10 text-white/30 hover:text-white hover:bg-white/5'}`}
+                        className={`px-6 py-2 rounded-full border text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 mx-auto ${theme === 'light' ? 'border-slate-200 text-slate-400 hover:bg-slate-50' : 'border-white/10 text-white/30 hover:text-white hover:bg-white/5'}`}
                     >
                         <Play size={12} fill="currentColor" /> Force Launch
                     </button>
@@ -121,7 +117,7 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
             </div>
         )}
 
-        {/* Console - Hidden on smallest mobile screens to save CPU */}
+        {/* Console - Hidden on mobile, optimized for CPU */}
         <div className="absolute bottom-0 left-0 p-4 w-full pointer-events-none z-10 hidden sm:block">
             <div className={`font-mono text-[9px] p-2 rounded max-w-[240px] border ${theme === 'light' ? 'bg-white/60 text-blue-800 border-white' : 'bg-black/60 text-void-accent border-white/5'}`}>
                 <pre className="whitespace-pre-wrap m-0 opacity-70 leading-tight font-mono">{consoleOutput}</pre>

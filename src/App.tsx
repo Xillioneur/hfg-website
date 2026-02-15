@@ -8,6 +8,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Games = lazy(() => import('./pages/Games'));
 const GameDetail = lazy(() => import('./pages/GameDetail'));
 const About = lazy(() => import('./pages/About'));
+const Admin = lazy(() => import('./pages/Admin'));
 
 // Loading component for Suspense
 const PageLoader = () => (
@@ -27,6 +28,7 @@ function App() {
               <Route path="/games" element={<Games />} />
               <Route path="/games/:id" element={<GameDetail />} />
               <Route path="/about" element={<About />} />
+              <Route path="/admin" element={<Admin />} />
             </Routes>
           </Suspense>
         </Layout>

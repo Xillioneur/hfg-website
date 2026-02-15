@@ -29,7 +29,7 @@ const About: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`p-8 rounded-2xl border transition-colors ${theme === 'light' ? 'bg-white border-slate-100' : 'bg-zinc-900 border-zinc-800'}`}
+          className={`p-8 rounded-2xl border transition-colors ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'bg-void-primary/40 border-void-border'}`}
         >
             <Hammer className={`w-8 h-8 mb-6 ${theme === 'light' ? 'text-heaven-accent' : 'text-void-accent'}`} />
             <h2 className={`text-xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Craftsmanship</h2>
@@ -44,7 +44,7 @@ const About: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className={`p-8 rounded-2xl border transition-colors ${theme === 'light' ? 'bg-white border-slate-100' : 'bg-zinc-900 border-zinc-800'}`}
+          className={`p-8 rounded-2xl border transition-colors ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'bg-void-primary/40 border-void-border'}`}
         >
             <Users className="text-blue-500 w-8 h-8 mb-6" />
             <h2 className={`text-xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Community</h2>
@@ -59,7 +59,7 @@ const About: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className={`p-8 rounded-2xl border transition-colors ${theme === 'light' ? 'bg-white border-slate-100' : 'bg-zinc-900 border-zinc-800'}`}
+          className={`p-8 rounded-2xl border transition-colors ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'bg-void-primary/40 border-void-border'}`}
         >
             <Heart className="text-red-500 w-8 h-8 mb-6" />
             <h2 className={`text-xl font-bold mb-3 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Inspiration</h2>
@@ -71,11 +71,39 @@ const About: React.FC = () => {
         </motion.div>
       </div>
 
+      {/* Forge Roadmap Section */}
       <motion.div 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className={`mt-16 p-10 rounded-3xl border text-center transition-all ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-zinc-900/50 border-zinc-800'}`}
+        className="mt-24 space-y-12"
+      >
+        <div className="text-center">
+            <h2 className={`text-2xl font-black uppercase tracking-widest mb-4 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>The Forge Roadmap</h2>
+            <p className="text-sm text-slate-500 font-medium tracking-tight">Evolving the craft of native execution.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+                { phase: "Q1 2026", goal: "WASM Handshake v1.0", status: "COMPLETE" },
+                { phase: "Q2 2026", goal: "Real-time Telemetry", status: "IN PROGRESS" },
+                { phase: "Q3 2026", goal: "Multiplayer Alpha", status: "PLANNING" },
+                { phase: "Q4 2026", goal: "VR Integration", status: "RESEARCH" }
+            ].map((milestone) => (
+                <div key={milestone.phase} className={`p-6 rounded-2xl border transition-all ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm hover:shadow-md' : 'bg-void-primary/40 border-void-border hover:bg-void-primary/60'}`}>
+                    <span className={`block text-[9px] font-black tracking-widest uppercase mb-2 ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>{milestone.phase}</span>
+                    <h4 className={`text-sm font-bold mb-4 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{milestone.goal}</h4>
+                    <span className={`inline-block px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${milestone.status === 'COMPLETE' ? 'bg-green-500/10 text-green-500' : 'bg-slate-500/10 text-slate-500'}`}>{milestone.status}</span>
+                </div>
+            ))}
+        </div>
+      </motion.div>
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className={`mt-24 p-10 rounded-3xl border text-center transition-all ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-zinc-900/50 border-zinc-800'}`}
       >
         <h3 className={`text-xl font-bold mb-4 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
             {theme === 'light' ? 'Join the Ascension' : 'Submit to the Void'}
