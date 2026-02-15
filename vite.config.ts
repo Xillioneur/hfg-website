@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     cors: true,
     headers: {
+      // 'credentialless' is more permissive for same-origin assets than 'require-corp'
       'Cross-Origin-Embedder-Policy': 'credentialless',
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Resource-Policy': 'cross-origin',

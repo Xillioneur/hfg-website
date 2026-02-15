@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { SITE_URL, SEO_DEFAULTS } from '../constants';
 
 interface SEOProps {
   title?: string;
@@ -9,14 +10,20 @@ interface SEOProps {
 }
 
 const SEO: React.FC<SEOProps> = ({ 
-  title = "HolyForge Games | Elite C++ & WebAssembly Native Gaming", 
-  description = "Experience high-performance C++ games running natively in your browser. Built with Raylib and WebAssembly for elite execution.",
-  image = "https://holyforgegames.pages.dev/og-image.png",
+  title = SEO_DEFAULTS.title, 
+  description = SEO_DEFAULTS.description,
+  image = SEO_DEFAULTS.image,
   type = "website"
 }) => {
   const location = useLocation();
-  const url = `https://holyforgegames.pages.dev${location.pathname}`;
-  const ogImage = `${image}?v=${Date.now()}`; // Force refresh for crawlers
+  const url = `${SITE_URL}${location.pathname}`;
+  
+  // Ensure image is absolute for crawlers
+  const absoluteImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+  
+  // Cache buster for production social previews
+  const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+  const finalImage = isProduction ? `${absoluteImage}?v=${Date.now()}` : absoluteImage;
 
   useEffect(() => {
     document.title = title;
@@ -44,17 +51,17 @@ const SEO: React.FC<SEOProps> = ({
     // OpenGraph
     updateMeta('meta[property="og:title"]', 'content', title);
     updateMeta('meta[property="og:description"]', 'content', description);
-    updateMeta('meta[property="og:image"]', 'content', ogImage);
+    updateMeta('meta[property="og:image"]', 'content', finalImage);
     updateMeta('meta[property="og:url"]', 'content', url);
     updateMeta('meta[property="og:type"]', 'content', type);
 
     // Twitter / X
     updateMeta('meta[name="twitter:title"]', 'content', title);
     updateMeta('meta[name="twitter:description"]', 'content', description);
-    updateMeta('meta[name="twitter:image"]', 'content', ogImage);
+    updateMeta('meta[name="twitter:image"]', 'content', finalImage);
     updateMeta('meta[name="twitter:url"]', 'content', url);
 
-  }, [title, description, ogImage, url, type]);
+  }, [title, description, finalImage, url, type]);
 
   return null;
 };

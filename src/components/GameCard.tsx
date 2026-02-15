@@ -24,6 +24,10 @@ const GameCard: React.FC<GameCardProps> = memo(({ game }) => {
           alt={game.title} 
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = 'https://placehold.co/600x400/020617/f59e0b?text=Image+Unavailable';
+          }}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         <div className="absolute top-3 right-3 z-20">
