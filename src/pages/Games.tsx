@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useTransition } from 'react';
 import { games, GameCategory } from '../data/games';
 import GameCard from '../components/GameCard';
 import { Search, Filter, Box } from 'lucide-react';
@@ -11,14 +11,22 @@ const Games: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<GameCategory | 'All'>('All');
   const [isReady, setIsReady] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { theme } = useTheme();
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsReady(true), 300);
-    return () => clearTimeout(timer);
+    // metadata is small enough to be near-instant
+    const timer = requestAnimationFrame(() => setIsReady(true));
+    return () => cancelAnimationFrame(timer);
   }, []);
 
   const categories: (GameCategory | 'All')[] = ['All', 'Tutorial', 'Studio', 'Tech Demo', 'Classic'];
+
+  const handleCategoryChange = (cat: GameCategory | 'All') => {
+    startTransition(() => {
+      setSelectedCategory(cat);
+    });
+  };
 
   const filteredGames = useMemo(() => {
     return games.filter(game => {
@@ -75,7 +83,7 @@ const Games: React.FC = () => {
               {categories.map(cat => (
                 <button
                   key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => handleCategoryChange(cat)}
                   className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-2 ${
                     selectedCategory === cat
                       ? theme === 'light' ? 'bg-slate-900 text-white border-slate-900' : 'bg-amber-500 text-black border-amber-500'
@@ -90,22 +98,21 @@ const Games: React.FC = () => {
         </div>
 
         {/* Gallery Grid */}
-        <div className="min-h-[400px]">
+        <div className={`min-h-[400px] transition-opacity duration-300 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
           {!isReady ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {Array(6).fill(0).map((_, i) => <GameCardSkeleton key={i} />)}
             </div>
           ) : filteredGames.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-              <AnimatePresence mode='popLayout'>
+              <AnimatePresence mode='wait'>
                 {filteredGames.map((game) => (
                   <motion.div
-                    layout
                     key={game.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
                   >
                     <GameCard game={game} />
                   </motion.div>
