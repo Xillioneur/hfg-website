@@ -2,7 +2,7 @@ import React, { useState, memo, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { games } from '../data/games';
 import WasmPlayer from '../components/WasmPlayer';
-import { ArrowLeft, Code, Play, Cpu, Clock, Box, Loader2, Zap, Quote } from 'lucide-react';
+import { ArrowLeft, Code, Play, Cpu, Clock, Loader2, Zap, Quote, Monitor, Maximize } from 'lucide-react';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import cpp from 'react-syntax-highlighter/dist/esm/languages/prism/cpp';
 import c from 'react-syntax-highlighter/dist/esm/languages/prism/c';
@@ -87,6 +87,7 @@ const GameDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const game = useMemo(() => games.find(g => g.id === id), [id]);
   const [activeTab, setActiveTab] = useState<'play' | 'code'>('play');
+  const [isTheatreMode, setIsTheatreMode] = useState(false);
   const [selectedFileIndex, setSelectedFileIndex] = useState(0);
   const [fileContents, setFileContents] = useState<Record<string, string>>({});
   const [isFetching, setIsFetching] = useState(false);
@@ -137,6 +138,17 @@ const GameDetail: React.FC = () => {
   const currentFile = game.sourceFiles[selectedFileIndex];
   const currentContent = fileContents[currentFile.path] || "";
 
+  const toggleFullscreen = () => {
+    const playerElement = document.getElementById('wasm-player-container');
+    if (playerElement) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        playerElement.requestFullscreen();
+      }
+    }
+  };
+
   return (
     <>
       <SEO 
@@ -153,9 +165,9 @@ const GameDetail: React.FC = () => {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="container mx-auto px-6 py-10 max-w-7xl"
+        className={`container mx-auto px-6 py-10 transition-all duration-500 ${isTheatreMode ? 'max-w-full' : 'max-w-7xl'}`}
       >
-        <div className="mb-10">
+        <div className={`mb-10 ${isTheatreMode ? 'max-w-7xl mx-auto' : ''}`}>
           <Link to="/games" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-current transition-colors mb-6 group">
              <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" /> Back to Library
           </Link>
@@ -198,11 +210,34 @@ const GameDetail: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-8 space-y-10">
-              <div className={`rounded-3xl overflow-hidden shadow-2xl transition-all ${theme === 'light' ? 'bg-white shadow-slate-200/50 border border-slate-100' : 'bg-black shadow-black/50 border border-white/5'}`}>
+        <div className={`grid lg:grid-cols-12 gap-12 ${isTheatreMode ? 'flex flex-col' : ''}`}>
+          <div className={`transition-all duration-500 ${isTheatreMode ? 'lg:col-span-12' : 'lg:col-span-8'} space-y-10`}>
+              <div 
+                id="wasm-player-container"
+                className={`rounded-3xl overflow-hidden shadow-2xl transition-all relative ${theme === 'light' ? 'bg-white shadow-slate-200/50 border border-slate-100' : 'bg-black shadow-black/50 border border-white/5'}`}
+              >
+                  {/* Player Controls Overlay */}
+                  {activeTab === 'play' && (
+                    <div className="absolute top-4 right-4 z-30 flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => setIsTheatreMode(!isTheatreMode)}
+                          className={`p-2 rounded-lg bg-black/50 backdrop-blur-md text-white hover:bg-black/80 transition-colors`}
+                          title="Theatre Mode"
+                        >
+                          <Monitor size={18} className={isTheatreMode ? 'text-amber-500' : ''} />
+                        </button>
+                        <button 
+                          onClick={toggleFullscreen}
+                          className={`p-2 rounded-lg bg-black/50 backdrop-blur-md text-white hover:bg-black/80 transition-colors`}
+                          title="Fullscreen"
+                        >
+                          <Maximize size={18} />
+                        </button>
+                    </div>
+                  )}
+
                   {activeTab === 'play' ? (
-                      <div className="relative">
+                      <div className={`relative ${isTheatreMode ? 'aspect-[21/9]' : 'aspect-video'} transition-all duration-500`}>
                           <WasmPlayer gameId={game.id} />
                       </div>
                   ) : (
@@ -251,7 +286,7 @@ const GameDetail: React.FC = () => {
                   )}
               </div>
               
-              <div className="space-y-6">
+              <div className={`space-y-6 ${isTheatreMode ? 'max-w-7xl mx-auto' : ''}`}>
                   <div className="prose dark:prose-invert max-w-none">
                       <h3 className={`text-xl font-bold flex items-center gap-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                           Mission Briefing
@@ -269,22 +304,10 @@ const GameDetail: React.FC = () => {
               </div>
           </div>
 
-          <div className="lg:col-span-4 space-y-8">
-              {game.assets && (
-                  <div className={`p-8 rounded-3xl border ${theme === 'light' ? 'bg-blue-50 border-blue-100' : 'bg-void-accent/5 border-void-accent/10'}`}>
-                      <h4 className={`text-xs font-black uppercase tracking-widest mb-6 ${theme === 'light' ? 'text-blue-600' : 'text-void-accent'}`}>Asset Manifest</h4>
-                      <div className="space-y-3">
-                          {game.assets.map(asset => (
-                              <div key={asset} className="flex items-center gap-3 text-[11px] font-mono font-bold">
-                                  <Box size={14} className="opacity-50" />
-                                  <span className={theme === 'light' ? 'text-slate-700' : 'text-slate-300'}>{asset}</span>
-                              </div>
-                          ))}
-                      </div>
-                  </div>
-              )}
-
-              <EngineeringHighlights theme={theme} gameId={game.id} />
+          <div className={`transition-all duration-500 ${isTheatreMode ? 'lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto w-full' : 'lg:col-span-4 space-y-8'}`}>
+              <div className={isTheatreMode ? 'space-y-8' : 'space-y-8'}>
+                <EngineeringHighlights theme={theme} gameId={game.id} />
+              </div>
               <TechnicalManifest theme={theme} />
               <TelemetryStats theme={theme} />
           </div>

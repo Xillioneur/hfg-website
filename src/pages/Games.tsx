@@ -1,15 +1,22 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { games, GameCategory } from '../data/games';
 import GameCard from '../components/GameCard';
 import { Search, Filter, Box } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
+import GameCardSkeleton from '../components/GameCardSkeleton';
 
 const Games: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<GameCategory | 'All'>('All');
+  const [isReady, setIsReady] = useState(false);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const categories: (GameCategory | 'All')[] = ['All', 'Tutorial', 'Studio', 'Tech Demo', 'Classic'];
 
@@ -84,7 +91,11 @@ const Games: React.FC = () => {
 
         {/* Gallery Grid */}
         <div className="min-h-[400px]">
-          {filteredGames.length > 0 ? (
+          {!isReady ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {Array(6).fill(0).map((_, i) => <GameCardSkeleton key={i} />)}
+            </div>
+          ) : filteredGames.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               <AnimatePresence mode='popLayout'>
                 {filteredGames.map((game) => (
