@@ -4,7 +4,7 @@
   "compatibility_date": "2025-02-14",
   "d1_databases": [
     {
-      "binding": "holyforge_db",
+      "binding": "DB",
       "database_name": "holyforge-db",
       "database_id": "52de1110-4e29-4968-96dc-84fe4558304d"
     }

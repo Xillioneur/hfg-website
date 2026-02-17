@@ -1,4 +1,15 @@
+# Cloudflare Pages Redirects and SPA Fallback
+
+# Explicitly handle game assets to prevent SPA fallback issues
+# These should point to their actual file paths
+/games/*.js /games/:splat.js 200
+/games/*.wasm /games/:splat.wasm 200
+
+# Explicitly handle known SPA routes
 /about /index.html 200
 /games /index.html 200
+/games/:id /index.html 200
 /admin /index.html 200
+
+# Generic SPA Fallback (must be last)
 /* /index.html 200

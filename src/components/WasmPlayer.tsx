@@ -18,7 +18,6 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
     setError(null);
     
     // Defer loading the iframe until after the first paint
-    // This makes the page transition feel much snappier
     const mountTimer = setTimeout(() => setIsMounted(true), 50);
 
     const handleMessage = (event: MessageEvent) => {
@@ -54,7 +53,8 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
                 allow="cross-origin-isolated; autoplay; fullscreen"
                 title="HolyForge Game Player"
                 scrolling="no"
-                sandbox="allow-scripts allow-same-origin allow-forms"
+                // Allow specific sandbox permissions
+                sandbox="allow-scripts allow-forms allow-popups allow-modals allow-pointer-lock"
             />
         )}
 
