@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, lowPerformanceMode, togglePerformanceMode } = useTheme();
   const location = useLocation();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -137,9 +137,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           
           <div className="mt-16 pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
             <p>© {new Date().getFullYear()} HOLYFORGE GAMES. SOLI DEO GLORIA.</p>
-            <div className="flex gap-6">
+            <div className="flex gap-6 items-center">
                 <span>By Willie Johnson</span>
-                <span className={theme === 'light' ? 'text-blue-600' : 'text-amber-500'}>Version 0.9 (STABLE)</span>
+                <button 
+                  onClick={togglePerformanceMode}
+                  className={`px-3 py-1 rounded border transition-colors ${lowPerformanceMode ? (theme === 'light' ? 'bg-blue-600 text-white border-blue-600' : 'bg-amber-500 text-black border-amber-500') : 'border-slate-300 dark:border-white/10 hover:text-current'}`}
+                >
+                  {lowPerformanceMode ? 'Low Power: ON' : 'Low Power: OFF'}
+                </button>
+                <span className={theme === 'light' ? 'text-blue-600' : 'text-amber-500'}>Version 0.9.5</span>
             </div>
           </div>
         </div>

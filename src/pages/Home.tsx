@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { games } from '../data/games';
 import GameCard from '../components/GameCard';
@@ -10,16 +10,27 @@ import SEO from '../components/SEO';
 import GameCardSkeleton from '../components/GameCardSkeleton';
 
 const Home: React.FC = () => {
-  const { theme } = useTheme();
+  const { theme, lowPerformanceMode } = useTheme();
   const { progress } = useProgress();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Immediate ready state for better performance
     setIsReady(true);
   }, []);
 
+  const proverbs = [
+    "Clean code is a form of stewardship.",
+    "Optimization is the pursuit of technical holiness.",
+    "Let every cycle be purposeful and every byte be pure.",
+    "The forge is hot, but the spirit is disciplined.",
+    "Created in His image, we create with His excellence."
+  ];
+  const dailyProverb = useMemo(() => proverbs[Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % proverbs.length], []);
+
   const recentlyPlayedGames = games.filter(g => progress.recentlyPlayed.includes(g.id));
+
+  // Optimization: Disable motion if lowPerformanceMode is ON
+  const motionProps = lowPerformanceMode ? { initial: { opacity: 1 }, animate: { opacity: 1 } } : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 } };
 
   return (
     <>
@@ -32,11 +43,16 @@ const Home: React.FC = () => {
         <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden border-b border-slate-100 dark:border-white/5">
           <div className="container mx-auto px-6 relative z-10 text-center max-w-5xl">
             <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
+              {...motionProps}
+              transition={{ duration: 0.4 }}
               className="space-y-8"
             >
+              <div className="mb-4">
+                <p className={`text-[10px] font-black uppercase tracking-[0.4em] italic opacity-40 ${theme === 'light' ? 'text-blue-900' : 'text-amber-500'}`}>
+                  "{dailyProverb}"
+                </p>
+              </div>
+
               <div className="flex justify-center">
                 <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border backdrop-blur-md transition-all ${theme === 'light' ? 'bg-white/50 border-blue-100 text-blue-600 shadow-sm' : 'bg-white/5 border-white/10 text-void-accent shadow-lg shadow-void-accent/5'}`}>
                   Engineered for Performance
@@ -76,7 +92,7 @@ const Home: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {!isReady ? Array(recentlyPlayedGames.length).fill(0).map((_, i) => <GameCardSkeleton key={i} />) : 
                 recentlyPlayedGames.map(game => (
-                  <motion.div key={game.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div key={game.id} {...(lowPerformanceMode ? {} : { initial: { opacity: 0 }, animate: { opacity: 1 } })}>
                     <GameCard game={game} />
                   </motion.div>
                 ))}
@@ -101,9 +117,12 @@ const Home: React.FC = () => {
               games.slice(0, 3).map((game, idx) => (
                 <motion.div 
                   key={game.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: idx * 0.05 }}
+                  {...(lowPerformanceMode ? {} : {
+                    initial: { opacity: 0, y: 20 },
+                    whileInView: { opacity: 1, y: 0 },
+                    viewport: { once: true, margin: "-50px" },
+                    transition: { delay: idx * 0.05, duration: 0.4 }
+                  })}
                 >
                   <GameCard game={game} />
                 </motion.div>
