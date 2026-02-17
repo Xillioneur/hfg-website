@@ -8,13 +8,13 @@ const GameBadge: React.FC<{ category: GameCategory }> = ({ category }) => {
   const getStyles = () => {
     switch (category) {
       case 'Tutorial':
-        return theme === 'light' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-blue-900/20 text-blue-400 border-blue-800/30';
+        return theme === 'light' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-900/30 text-blue-300 border-blue-500/30';
       case 'Studio':
-        return theme === 'light' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-indigo-900/20 text-indigo-400 border-indigo-800/30';
+        return theme === 'light' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-900/30 text-amber-300 border-amber-500/30';
       case 'Tech Demo':
-        return theme === 'light' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-emerald-900/20 text-emerald-400 border-emerald-800/30';
+        return theme === 'light' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-purple-900/30 text-purple-300 border-purple-500/30';
       case 'Classic':
-        return theme === 'light' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-amber-900/20 text-amber-400 border-amber-800/30';
+        return theme === 'light' ? 'bg-stone-100 text-stone-700 border-stone-200' : 'bg-stone-800 text-stone-300 border-stone-600';
       default:
         return 'bg-slate-100 text-slate-600 border-slate-200';
     }
