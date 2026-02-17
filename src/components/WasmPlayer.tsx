@@ -53,8 +53,8 @@ const WasmPlayer: React.FC<WasmPlayerProps> = ({ gameId }) => {
                 allow="cross-origin-isolated; autoplay; fullscreen"
                 title="HolyForge Game Player"
                 scrolling="no"
-                // Allow specific sandbox permissions
-                sandbox="allow-scripts allow-forms allow-popups allow-modals allow-pointer-lock"
+                // Re-adding allow-same-origin for localStorage and proper origin handling
+                sandbox="allow-scripts allow-forms allow-popups allow-modals allow-pointer-lock allow-same-origin"
             />
         )}
 
