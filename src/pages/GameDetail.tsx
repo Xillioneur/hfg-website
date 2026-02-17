@@ -2,7 +2,7 @@ import React, { useState, memo, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { games } from '../data/games';
 import WasmPlayer from '../components/WasmPlayer';
-import { ArrowLeft, Code, Play, Cpu, Clock, Loader2, Zap, Quote, Monitor, Maximize } from 'lucide-react';
+import { ArrowLeft, Code, Play, Cpu, Clock, Loader2, Zap, Quote, Monitor, Maximize, Heart } from 'lucide-react';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import cpp from 'react-syntax-highlighter/dist/esm/languages/prism/cpp';
 import c from 'react-syntax-highlighter/dist/esm/languages/prism/c';
@@ -82,6 +82,44 @@ const TelemetryStats = memo(({ theme }: { theme: 'light' | 'dark' }) => (
     </div>
   </div>
 ));
+
+const GlobalHeartbeat = memo(({ theme, gameId }: { theme: 'light' | 'dark', gameId: string }) => {
+  const [hearts, setHearts] = useState(0);
+  const [isLiking, setIsLiking] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/hearts?gameId=${gameId}`)
+      .then(res => res.json())
+      .then(data => setHearts(data.hearts || 0));
+  }, [gameId]);
+
+  const addHeart = async () => {
+    setIsLiking(true);
+    setHearts(prev => prev + 1);
+    await fetch('/api/hearts', { 
+      method: 'POST', 
+      body: JSON.stringify({ gameId }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    setTimeout(() => setIsLiking(false), 500);
+  };
+
+  return (
+    <div className={`p-6 rounded-3xl border transition-all flex items-center justify-between ${theme === 'light' ? 'bg-white border-slate-100 shadow-sm' : 'bg-void-primary/40 border-void-border'}`}>
+        <div className="space-y-1">
+            <span className="block text-[9px] font-black uppercase tracking-widest text-slate-500">Community_Pulse</span>
+            <span className={`text-xl font-black ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{hearts.toLocaleString()}</span>
+        </div>
+        <button 
+            onClick={addHeart}
+            disabled={isLiking}
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isLiking ? 'scale-90 bg-red-500 text-white' : (theme === 'light' ? 'bg-slate-50 text-slate-400 hover:text-red-500 hover:bg-red-50' : 'bg-white/5 text-slate-500 hover:text-red-500 hover:bg-red-500/10')}`}
+        >
+            <Heart size={20} fill={isLiking ? "currentColor" : "none"} />
+        </button>
+    </div>
+  );
+});
 
 const GameDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -305,6 +343,7 @@ const GameDetail: React.FC = () => {
           </div>
 
           <div className={`transition-all duration-500 ${isTheatreMode ? 'lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto w-full' : 'lg:col-span-4 space-y-8'}`}>
+              <GlobalHeartbeat theme={theme} gameId={game.id} />
               <div className={isTheatreMode ? 'space-y-8' : 'space-y-8'}>
                 <EngineeringHighlights theme={theme} gameId={game.id} />
               </div>

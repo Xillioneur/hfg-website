@@ -104,17 +104,74 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {children}
       </main>
 
-      <footer className={`py-10 border-t transition-colors duration-500 ${theme === 'light' ? 'bg-white border-slate-100' : 'bg-black/20 border-white/5'}`}>
-        <div className="container mx-auto px-6 max-w-6xl flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-          <p>© {new Date().getFullYear()} HOLYFORGE GAMES. SOLI DEO GLORIA.</p>
-          <div className="flex gap-6 items-center">
-              <button 
-                onClick={togglePerformanceMode}
-                className={`px-3 py-1 rounded-md border transition-colors ${lowPerformanceMode ? (theme === 'light' ? 'bg-slate-900 text-white border-slate-900' : 'bg-void-accent text-black border-void-accent') : 'border-slate-200 dark:border-white/10 hover:text-current'}`}
+      <footer className={`py-12 border-t transition-colors duration-500 ${theme === 'light' ? 'bg-white border-slate-100' : 'bg-black/20 border-white/5'}`}>
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            {/* Brand Column */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-7 h-7 rounded flex items-center justify-center text-white font-black text-xs ${theme === 'light' ? 'bg-slate-900' : 'bg-void-accent text-black'}`}>H</div>
+                <span className="font-black tracking-tight text-lg">HOLYFORGE</span>
+              </div>
+              <p className="text-[11px] leading-relaxed font-medium uppercase tracking-wide text-slate-500">
+                Crafted for Glory. <br/>Engineered for Eternity.
+              </p>
+            </div>
+
+            {/* Newsletter Column */}
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Join the Forge</h4>
+              <form 
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const input = e.currentTarget.elements.namedItem('email') as HTMLInputElement;
+                  const res = await fetch('/api/newsletter', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: input.value }),
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  if (res.ok) {
+                    alert("Welcome to the Forge.");
+                    input.value = '';
+                  }
+                }}
+                className="flex flex-col gap-2"
               >
-                {lowPerformanceMode ? 'Lite: ON' : 'Lite: OFF'}
-              </button>
-              <span className={theme === 'light' ? 'text-slate-900' : 'text-white'}>By Willie Johnson</span>
+                <input 
+                  name="email"
+                  type="email" 
+                  placeholder="Your Email" 
+                  className={`px-3 py-2.5 rounded-xl text-[10px] border transition-all outline-none ${theme === 'light' ? 'bg-slate-50 border-slate-200 focus:border-heaven-accent' : 'bg-white/5 border-white/5 focus:border-void-accent'}`}
+                  required 
+                />
+                <button type="submit" className={`py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all ${theme === 'light' ? 'bg-slate-900 text-white hover:bg-heaven-accent' : 'bg-void-accent text-black hover:bg-white'}`}>
+                  Initialize Sync
+                </button>
+              </form>
+            </div>
+
+            {/* Connect Column */}
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Connect</h4>
+              <div className="flex flex-col gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                <a href="https://x.com/liwawil" target="_blank" rel="noreferrer" className="hover:text-current transition-colors">X.com</a>
+                <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-current transition-colors">GitHub</a>
+                <Link to="/about" className="hover:text-current transition-colors">Mission Control</Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">
+            <p>© {new Date().getFullYear()} HOLYFORGE GAMES. SOLI DEO GLORIA.</p>
+            <div className="flex gap-6 items-center">
+                <button 
+                  onClick={togglePerformanceMode}
+                  className={`px-3 py-1 rounded-md border transition-colors ${lowPerformanceMode ? (theme === 'light' ? 'bg-slate-900 text-white border-slate-900' : 'bg-void-accent text-black border-void-accent') : 'border-slate-200 dark:border-white/10 hover:text-current'}`}
+                >
+                  {lowPerformanceMode ? 'Lite: ON' : 'Lite: OFF'}
+                </button>
+                <span className={theme === 'light' ? 'text-slate-900' : 'text-white'}>By Willie Johnson</span>
+            </div>
           </div>
         </div>
       </footer>
