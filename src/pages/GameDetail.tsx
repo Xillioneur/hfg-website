@@ -9,7 +9,6 @@ import c from 'react-syntax-highlighter/dist/esm/languages/prism/c';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from '../context/ThemeContext';
 import { useProgress } from '../hooks/useProgress';
-import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 
 SyntaxHighlighter.registerLanguage('cpp', cpp);
@@ -88,9 +87,13 @@ const GlobalHeartbeat = memo(({ theme, gameId }: { theme: 'light' | 'dark', game
   const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/hearts?gameId=${gameId}`)
+    // Background Fetch: Do not block initial render
+    const controller = new AbortController();
+    fetch(`/api/hearts?gameId=${gameId}`, { signal: controller.signal })
       .then(res => res.json())
-      .then(data => setHearts(data.hearts || 0));
+      .then(data => setHearts(data.hearts || 0))
+      .catch(() => {});
+    return () => controller.abort();
   }, [gameId]);
 
   const addHeart = async () => {
@@ -200,10 +203,7 @@ const GameDetail: React.FC = () => {
           {JSON.stringify(jsonLd)}
         </script>
       )}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className={`container mx-auto px-6 py-10 transition-all duration-500 ${isTheatreMode ? 'max-w-full' : 'max-w-7xl'}`}
+      <div className={`container mx-auto px-6 py-10 transition-all duration-500 ${isTheatreMode ? 'max-w-full' : 'max-w-7xl'}`}
       >
         <div className={`mb-10 ${isTheatreMode ? 'max-w-7xl mx-auto' : ''}`}>
           <Link to="/games" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-current transition-colors mb-6 group">
@@ -351,7 +351,7 @@ const GameDetail: React.FC = () => {
               <TelemetryStats theme={theme} />
           </div>
         </div>
-      </motion.div>
+      </div>
     </>
   );
 };

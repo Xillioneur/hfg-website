@@ -1,9 +1,8 @@
-import React, { useState, useMemo, useEffect, useTransition } from 'react';
+import React, { useState, useMemo, useEffect, useTransition, useDeferredValue } from 'react';
 import { games, GameCategory } from '../data/games';
 import GameCard from '../components/GameCard';
 import { Search, Filter, Box } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
 import GameCardSkeleton from '../components/GameCardSkeleton';
 
@@ -14,10 +13,10 @@ const Games: React.FC = () => {
   const [isPending, startTransition] = useTransition();
   const { theme } = useTheme();
 
+  const deferredSearch = useDeferredValue(searchTerm);
+
   useEffect(() => {
-    // metadata is small enough to be near-instant
-    const timer = requestAnimationFrame(() => setIsReady(true));
-    return () => cancelAnimationFrame(timer);
+    setIsReady(true);
   }, []);
 
   const categories: (GameCategory | 'All')[] = ['All', 'Tutorial', 'Studio', 'Tech Demo', 'Classic'];
@@ -30,12 +29,12 @@ const Games: React.FC = () => {
 
   const filteredGames = useMemo(() => {
     return games.filter(game => {
-      const matchesSearch = game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           game.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = game.title.toLowerCase().includes(deferredSearch.toLowerCase()) ||
+                           game.description.toLowerCase().includes(deferredSearch.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [deferredSearch, selectedCategory]);
 
   return (
     <>
@@ -60,7 +59,6 @@ const Games: React.FC = () => {
           </div>
           
           <div className="flex flex-col gap-6 w-full md:w-auto">
-            {/* Search Input */}
             <div className="relative w-full md:w-96 group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-current transition-colors">
                 <Search className="h-5 w-5" />
@@ -78,7 +76,6 @@ const Games: React.FC = () => {
               />
             </div>
 
-            {/* Category Filter */}
             <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
               {categories.map(cat => (
                 <button
@@ -97,34 +94,21 @@ const Games: React.FC = () => {
           </div>
         </div>
 
-        {/* Gallery Grid */}
-        <div className={`min-h-[400px] transition-opacity duration-300 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
+        <div className={`min-h-[400px] transition-opacity duration-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
           {!isReady ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {Array(6).fill(0).map((_, i) => <GameCardSkeleton key={i} />)}
             </div>
           ) : filteredGames.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-              <AnimatePresence mode='wait'>
-                {filteredGames.map((game) => (
-                  <motion.div
-                    key={game.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    <GameCard game={game} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              {filteredGames.map((game) => (
+                <div key={game.id}>
+                  <GameCard game={game} />
+                </div>
+              ))}
             </div>
           ) : (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className={`text-center py-32 rounded-[40px] border-2 border-dashed transition-colors ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-zinc-900/50 border-white/5'}`}
-            >
+            <div className={`text-center py-32 rounded-[40px] border-2 border-dashed transition-colors ${theme === 'light' ? 'bg-stone-50 border-stone-200' : 'bg-zinc-900/50 border-white/5'}`}>
               <Filter className="mx-auto mb-6 text-slate-300 dark:text-zinc-700" size={64} />
               <h3 className="text-xl font-black uppercase tracking-widest text-slate-500">Binary Not Found</h3>
               <button 
@@ -133,7 +117,7 @@ const Games: React.FC = () => {
               >
                 Reset System Query
               </button>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>

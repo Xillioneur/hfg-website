@@ -4,13 +4,12 @@ import { games } from '../data/games';
 import GameCard from '../components/GameCard';
 import { ArrowRight, Code, Zap, Globe, Cpu, Terminal } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { motion } from 'framer-motion';
 import { useProgress } from '../hooks/useProgress';
 import SEO from '../components/SEO';
 import GameCardSkeleton from '../components/GameCardSkeleton';
 
 const Home: React.FC = () => {
-  const { theme, lowPerformanceMode } = useTheme();
+  const { theme } = useTheme();
   const { progress } = useProgress();
   const [isReady, setIsReady] = useState(false);
 
@@ -29,8 +28,6 @@ const Home: React.FC = () => {
 
   const recentlyPlayedGames = games.filter(g => progress.recentlyPlayed.includes(g.id));
 
-  const motionProps = lowPerformanceMode ? { initial: { opacity: 1 }, animate: { opacity: 1 } } : { initial: { opacity: 0 }, animate: { opacity: 1 } };
-
   return (
     <>
       <SEO 
@@ -38,22 +35,17 @@ const Home: React.FC = () => {
         description="Experience elite C++ and C games running natively in your browser with zero latency. Powered by WebAssembly and the HolyForge Engine. Crafted for Glory and Performance."
       />
       <div className="pb-24">
-        {/* Compact Hero Section */}
+        {/* Compact Hero Section - Solid */}
         <section className="relative min-h-[50vh] pt-8 pb-12 flex items-center justify-center overflow-hidden">
-          <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl">
-            <motion.div 
-              {...motionProps}
-              transition={{ duration: 0.4 }}
-              className="space-y-6"
-            >
+          <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl space-y-6">
               <div className="flex justify-center">
-                <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-white/5 text-void-accent'}`}>
+                <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-white/5 text-void-accent'}`}>
                   V1.0 Stable Build
                 </span>
               </div>
               
               <h1 className={`text-5xl md:text-7xl font-black tracking-tight leading-[0.95] ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
-                Built for <span className="text-gold">Speed.</span><br/>
+                Built for <span className="text-heaven-accent">Speed.</span><br/>
                 Forged in Code.
               </h1>
               
@@ -70,7 +62,6 @@ const Home: React.FC = () => {
                   Mission
                 </Link>
               </div>
-            </motion.div>
           </div>
         </section>
 
@@ -83,7 +74,7 @@ const Home: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {recentlyPlayedGames.map(game => (
-                <div key={game.id} className="scale-95 origin-left">
+                <div key={game.id} className="scale-95 origin-left opacity-80 hover:opacity-100 transition-opacity">
                   <GameCard game={game} />
                 </div>
               ))}
@@ -91,7 +82,7 @@ const Home: React.FC = () => {
           </section>
         )}
 
-        {/* Featured Games */}
+        {/* Featured Games - Solid Grid */}
         <section className="container mx-auto px-6 py-12 max-w-6xl">
           <div className="flex justify-between items-end mb-8">
             <div className="space-y-1">
@@ -105,22 +96,22 @@ const Home: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {!isReady ? Array(3).fill(0).map((_, i) => <GameCardSkeleton key={i} />) : 
-              games.slice(0, 3).map((game, idx) => (
-                <motion.div key={game.id} {...(lowPerformanceMode ? {} : { initial: { opacity: 0, scale: 0.98 }, whileInView: { opacity: 1, scale: 1 }, transition: { delay: idx * 0.05 } })}>
+              games.slice(0, 3).map((game) => (
+                <div key={game.id}>
                   <GameCard game={game} />
-                </motion.div>
+                </div>
               ))}
           </div>
         </section>
 
-        {/* Proverb - Clean */}
+        {/* Proverb */}
         <section className="container mx-auto px-6 py-12 max-w-4xl text-center">
             <p className={`text-xs font-bold uppercase tracking-[0.3em] italic opacity-30 ${theme === 'light' ? 'text-slate-900' : 'text-amber-500'}`}>
                 "{dailyProverb}"
             </p>
         </section>
 
-        {/* Patch Notes - Solid */}
+        {/* Patch Notes */}
         <section className="container mx-auto px-6 py-12 max-w-6xl">
           <div className={`rounded-[32px] p-10 flex flex-col md:flex-row gap-12 items-center transition-colors ${theme === 'light' ? 'bg-white shadow-xl shadow-slate-200/40' : 'bg-void-surface shadow-2xl shadow-black/50'}`}>
             <div className="flex-1 space-y-4">
@@ -148,8 +139,8 @@ const Home: React.FC = () => {
               { icon: Zap, title: "High-Tech Execution", desc: "Multithreaded C++ binaries running in an isolated sandbox." },
               { icon: Code, title: "Open Stewardship", desc: "Transparent source code for all published modules." }
             ].map((feat, i) => (
-              <div key={i} className="space-y-4 group">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform mx-auto md:mx-0 group-hover:scale-110 ${theme === 'light' ? 'bg-slate-100 text-slate-600' : 'bg-white/5 text-void-accent'}`}>
+              <div key={i} className="space-y-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto md:mx-0 ${theme === 'light' ? 'bg-slate-100 text-slate-600' : 'bg-white/5 text-void-accent'}`}>
                   <feat.icon size={18} />
                 </div>
                 <h3 className={`text-[11px] font-black uppercase tracking-[0.2em] ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{feat.title}</h3>

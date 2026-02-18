@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Sun, Moon, Twitter } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -78,27 +77,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </header>
 
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.nav 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className={`md:hidden fixed inset-x-0 top-14 z-40 p-6 space-y-4 shadow-xl backdrop-blur-xl ${theme === 'light' ? 'bg-white/95 border-b' : 'bg-void-surface/95 border-b border-white/5'}`}
-          >
-            {['Home', 'Games', 'About'].map((item) => (
-                <Link 
-                    key={item}
-                    to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} 
-                    className="block text-sm font-black uppercase tracking-widest" 
-                    onClick={toggleMenu}
-                >
-                    {item}
-                </Link>
-            ))}
-          </motion.nav>
-        )}
-      </AnimatePresence>
+      <div className={`md:hidden fixed inset-x-0 top-14 z-40 p-6 space-y-4 shadow-xl backdrop-blur-xl transition-all duration-300 ${isMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'} ${theme === 'light' ? 'bg-white/95 border-b' : 'bg-void-surface/95 border-b border-white/5'}`}>
+        {['Home', 'Games', 'About'].map((item) => (
+            <Link 
+                key={item}
+                to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} 
+                className="block text-sm font-black uppercase tracking-widest" 
+                onClick={toggleMenu}
+            >
+                {item}
+            </Link>
+        ))}
+      </div>
 
       <main className="flex-grow">
         {children}

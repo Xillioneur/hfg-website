@@ -66,6 +66,8 @@ body {
 /* Modern Solid Components (No Borders) */
 .solid-card {
   @apply transition-all duration-300 rounded-2xl;
+  will-change: transform, opacity, box-shadow;
+  transform: translateZ(0); /* Force GPU layer */
 }
 
 .light .solid-card {
